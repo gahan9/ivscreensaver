@@ -10,7 +10,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 import xml.etree.ElementTree as ET
-
+from service import print_log as log
 import videomaker
 
 if sys.version_info >= (2, 7):
@@ -19,7 +19,7 @@ else:
     import simplejson as json
 
 # Import the common settings
-from resources.lib.settings import log
+# from resources.lib.settings import log
 from resources.lib.settings import Settings
 from resources.lib.settings import list_dir
 from resources.lib.settings import os_path_join
@@ -252,15 +252,15 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
                 random.shuffle(videosFiles_in_cache_folder)
                 for vidFile in videosFiles_in_cache_folder:
                     xbmc.log("VideFIle : " + str(vidFile), 2)
-                    # liz=xbmcgui.ListItem(ntpath.basename(vidFile),
-                    #                         iconImage = '',
-                    #                         thumbnailImage = '')
-                    # liz.setInfo( type = "Video", infoLabels=ntpath.basename(vidFile))
+                    liz = xbmcgui.ListItem(ntpath.basename(vidFile),
+                                            iconImage = '',
+                                            thumbnailImage = '')
+                    liz.setInfo( type = "Video", infoLabels=ntpath.basename(vidFile))
                     # #     # Now that we're actually playing the video, ask the scraper to give us the video url
-                    # vidFile=os.path.join(videosFolder,vidFile)
-                    # xbmc.log("url ::: :" + str(vidFile),2)
-                    # # playlist.add(vidFile, liz)
-                    # log("Screensaver video in directory is: %s" % vidFile)
+                    vidFile=os.path.join(videosFolder,vidFile)
+                    xbmc.log("url ::: :" + str(vidFile),2)
+                    playlist.add(vidFile, liz)
+                    log("Screensaver video in directory is: %s" % vidFile)
                     playlist.add(vidFile)
             # # Must be dealing with a single file
             # videoFile = Settings.getScreensaverVideo()

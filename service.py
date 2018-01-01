@@ -48,6 +48,7 @@ ADDON_RESOURCE_SETTING = os.path.join(ADDON_HOME, 'resources', 'settings.xml')
 user_resource_file = os.path.join(CACHE_DATA_FOLDER, 'resources', 'settings.xml')
 
 if not os.path.exists(user_resource_file):
+    os.makedirs(user_resource_file)
     with open(user_resource_file, "a+") as one:
         xbmc.log("createfileml")
 resource_file = os.path.join(CACHE_DATA_FOLDER, 'settings.xml')
