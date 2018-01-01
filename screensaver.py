@@ -241,10 +241,10 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
                 videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in os.listdir(Settings.get_current_week_even_odd()) if ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
 
-                xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
+                log("videos_in_imageFolder" + str(videos_in_imageFolder))
 
                 videosFiles_in_cache_folder.extend(videos_in_imageFolder)
-                xbmc.log("All files combines : " + str(videosFiles_in_cache_folder), 2)
+                log("All files combines : " + str(videosFiles_in_cache_folder))
 
 
                 # Now shuffle the playlist to ensure that if there are more

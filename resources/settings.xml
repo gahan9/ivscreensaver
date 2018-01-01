@@ -9,9 +9,9 @@
         <setting default="100" id="level" label="Dim Level" option="percent" range="0,1,100" type="slider" />
     </category>
     <category label="ODD_PICTURES">
-    <setting default="3" id="odd_quote_1.mp4" label="odd_quote_1" option="int" range="0,30" type="slider" /><setting default="3" id="odd_quote_2.mp4" label="odd_quote_2" option="int" range="0,30" type="slider" /><setting default="3" id="odd_quote_3.mp4" label="odd_quote_3" option="int" range="0,30" type="slider" /><setting default="3" id="odd_quote_4.mp4" label="odd_quote_4" option="int" range="0,30" type="slider" /></category>
+    </category>
     <category label="EVEN_PICTURES">
-    <setting default="3" id="even_anonymous1.mp4" label="even_anonymous1" option="int" range="0,30" type="slider" /><setting default="3" id="even_anonymous2.mp4" label="even_anonymous2" option="int" range="0,30" type="slider" /><setting default="3" id="even_anonymous3.mp4" label="even_anonymous3" option="int" range="0,30" type="slider" /><setting default="3" id="even_anonymous4.mp4" label="even_anonymous4" option="int" range="0,30" type="slider" /><setting default="3" id="even_camera.mp4" label="even_camera" option="int" range="0,30" type="slider" /><setting default="3" id="even_code.mp4" label="even_code" option="int" range="0,30" type="slider" /></category>
+    </category>
     <category label="Extra Features">
         <setting default="10" id="initiate_me" label="On Start Time" type="labelenum" values="10|20|30|40|50|" />
         <setting default="true" id="odd_even_is_enabled" label="Disable Odd Even Category" type="bool" />
