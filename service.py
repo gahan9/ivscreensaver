@@ -45,12 +45,7 @@ print_log("      ADDON_INITIALIZED...      ",
 if not os.path.exists(CACHE_DATA_FOLDER):
     xbmcvfs.mkdir(CACHE_DATA_FOLDER)
 ADDON_RESOURCE_SETTING = os.path.join(ADDON_HOME, 'resources', 'settings.xml')
-user_resource_file = os.path.join(CACHE_DATA_FOLDER, 'resources', 'settings.xml')
-copyfile(ADDON_RESOURCE_SETTING, user_resource_file)
-# if not os.path.exists(user_resource_file):
-#     os.makedirs(user_resource_file)
-#     with open(user_resource_file, "a+") as one:
-#         xbmc.log("createfileml")
+
 resource_file = os.path.join(CACHE_DATA_FOLDER, 'settings.xml')
 _image_extension = [".png", ".jpeg", ".jpg"]
 _video_extension = [".mp4", ".mkv", ".avi"]
