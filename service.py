@@ -7,7 +7,7 @@ import xbmcvfs
 from bs4 import BeautifulSoup
 from xml.etree.ElementTree import parse, Element
 import videomaker
-
+from shutil import copyfile
 
 def print_log(*args):
     try:
@@ -46,11 +46,11 @@ if not os.path.exists(CACHE_DATA_FOLDER):
     xbmcvfs.mkdir(CACHE_DATA_FOLDER)
 ADDON_RESOURCE_SETTING = os.path.join(ADDON_HOME, 'resources', 'settings.xml')
 user_resource_file = os.path.join(CACHE_DATA_FOLDER, 'resources', 'settings.xml')
-
-if not os.path.exists(user_resource_file):
-    os.makedirs(user_resource_file)
-    with open(user_resource_file, "a+") as one:
-        xbmc.log("createfileml")
+copyfile(ADDON_RESOURCE_SETTING, user_resource_file)
+# if not os.path.exists(user_resource_file):
+#     os.makedirs(user_resource_file)
+#     with open(user_resource_file, "a+") as one:
+#         xbmc.log("createfileml")
 resource_file = os.path.join(CACHE_DATA_FOLDER, 'settings.xml')
 _image_extension = [".png", ".jpeg", ".jpg"]
 _video_extension = [".mp4", ".mkv", ".avi"]
@@ -117,7 +117,7 @@ def writexml(path, flag=0):
 
 def readxml(directory_items):
     xbmc.log("IN read_xml")
-    with open(user_resource_file, "rb") as f:
+    with open(ADDON_RESOURCE_SETTING, "rb") as f:
         content = f.read()
         soup = BeautifulSoup(content, 'html.parser')
         settings = soup.find_all("category")
