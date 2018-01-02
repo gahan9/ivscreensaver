@@ -181,7 +181,7 @@ class Settings():
     @staticmethod
     def getScreensaverFolder():
         screenFolder = ADDON.getSetting("screensaverFolder").decode("utf-8")
-        
+
         # If the screensaver folder has not been set yet, then set it to default
         if screenFolder in [None, ""]:
             addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % ADDON_ID).decode("utf-8")
