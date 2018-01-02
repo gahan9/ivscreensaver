@@ -7,9 +7,17 @@ try:
     import xbmc
 except ImportError:
     pass
+
 try:
     ADDON_ID = 'screensaver.video-12'
     ADDON_PATH = xbmc.translatePath('special://home/addons/'+ADDON_ID)
+    if not os.path.exists(ADDON_PATH):
+        try:
+            from service import ADDON_HOME
+            from service import ADDON_ID
+            ADDON_PATH = xbmc.translatePath('special://home/addons/' + ADDON_ID)
+        except Exception as e:
+            pass
 except NameError:
     ADDON_PATH = os.getcwd()
 
@@ -44,6 +52,7 @@ class FileNotFoundError(Exception):
 
 class VideoMaker(object):
     def __init__(self, *args, **kwargs):
+        set_env(ffmpeg=ADDON_PATH)
         print_log("{:^25}".format("__INITIALIZED__"))
         self.supported_extension = ['jpg', 'jpeg', 'png']
         self.video_extension = ['mp4', 'mkv']
