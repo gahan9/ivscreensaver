@@ -48,12 +48,13 @@ class VideoMaker(object):
         self.supported_extension = ['jpg', 'jpeg', 'png']
         self.video_extension = ['mp4', 'mkv']
         self.codec = kwargs['codec'] if 'codec' in kwargs else "mp4v"
-        self.fps = kwargs['fps'] if 'fps' in kwargs else 5
+        self.fps = kwargs['fps'] if 'fps' in kwargs else 2
         self.duration = 5
         self.width = '1920'
         self.height = '1080'
 
-    def execute(self, path=None, duration=5, target_path=None, multi_threading=False):
+    def execute(self, path=None, duration=5, target_path=None, multi_threading=False, **kwargs):
+        duration_per_image = kwargs['image_dict'] if 'image_dict' in kwargs else None
         contents = os.listdir(path)
         target_path = target_path if target_path else os.path.join(path, ".cache")
         if not os.path.exists(target_path):
@@ -87,10 +88,10 @@ class VideoMaker(object):
         :param content: full absolute image path
         :param source_path: image location
         :param target_path: store video at this location
-        :param kwargs: 
+        :param kwargs:
         :param flag: flag set to decide whether video need to generate for image or not
-            flag='remove': to remove/overwrite file 
-        :return: 
+            flag='remove': to remove/overwrite file
+        :return:
         """
         try:
             from ffmpy import ffmpy  # placed module in local

@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from xml.etree.ElementTree import parse, Element
 import videomaker
 from shutil import copyfile
+import launchplugin
 
 def print_log(*args):
     try:
@@ -45,8 +46,10 @@ print_log("      ADDON_INITIALIZED...      ",
 if not os.path.exists(CACHE_DATA_FOLDER):
     xbmcvfs.mkdir(CACHE_DATA_FOLDER)
 ADDON_RESOURCE_SETTING = os.path.join(ADDON_HOME, 'resources', 'settings.xml')
-
 resource_file = os.path.join(CACHE_DATA_FOLDER, 'settings.xml')
+if not os.path.exists(resource_file):
+    with open(resource_file, "") as one:
+        xbmc.log("createfileml")
 _image_extension = [".png", ".jpeg", ".jpg"]
 _video_extension = [".mp4", ".mkv", ".avi"]
 
@@ -104,7 +107,7 @@ def writexml(path, flag=0):
     xbmc.executebuiltin("ActivateWindow(busydialog)")
     xbmc.sleep(200)
     videomaker.main(image_list=path)
-    print_log(os.listdir(cache_folder), path)
+    # print_log(os.listdir(cache_folder), path)
     insert_data(content_list=os.listdir(cache_folder), content_location=path, flag=flag)
     xbmc.sleep(300)
     xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -168,7 +171,7 @@ if __name__ == '__main__':
     monitor = BaseMonitor()
 
     # Check if we should start the screen saver video on startup
-    # launchplugin.main()
+    launchplugin.main()
     while not monitor.abortRequested():
         xbmc.sleep(500)
         if monitor.abortRequested():
@@ -178,14 +181,16 @@ if __name__ == '__main__':
         recursive_path_check = check_new_path()
         if monitor.onSettingsChanged():
             # print_log("Settings Changed")
-            if not media_data_path['select_media_odd'] == recursive_path_check['select_media_odd']:
-                print_log("odd_change_trigger")
-                get_odd_path = recursive_path_check.get("select_media_odd")
-                writexml(get_odd_path, flag=1)
-            if not media_data_path['select_media_even'] == recursive_path_check['select_media_even']:
-                print_log("even_change_trigger")
-                get_even_path = recursive_path_check.get("select_media_even")
-                writexml(get_even_path, flag=0)
+            if 'select_media_odd' in media_data_path and 'select_media_odd' in recursive_path_check:
+                if not media_data_path['select_media_odd'] == recursive_path_check['select_media_odd']:
+                    print_log("odd_change_trigger")
+                    get_odd_path = recursive_path_check.get("select_media_odd")
+                    writexml(get_odd_path, flag=1)
+            if 'select_media_even' in media_data_path and 'select_media_even' in recursive_path_check:
+                if not media_data_path['select_media_even'] == recursive_path_check['select_media_even']:
+                    print_log("even_change_trigger")
+                    get_even_path = recursive_path_check.get("select_media_even")
+                    writexml(get_even_path, flag=0)
             media_data_path = check_new_path()
         else:
             xbmc.sleep(500)

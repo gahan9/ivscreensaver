@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
-import xbmc
-import xbmcaddon
-
-# Import the common settings
-from resources.lib.settings import log
-
+import xbmc, xbmcaddon, json, os, time
 ADDON = xbmcaddon.Addon(id='screensaver.video-12')
 
 #########################
-# Main
+# Constants
+check_gui = xbmc.translatePath(os.path.join('special://home/addons/screensaver.video-12'))
 #########################
 
 
 def main():
-    # log('script version %s started' % ADDON.getAddonInfo('version'))
-    # Close any open dialogs
-    xbmc.executebuiltin("Dialog.Close(all, true)", True)
-    # log("VideoScreensaver: Running as Addon/Plugin")
-    xbmc.executebuiltin("RunAddon(screensaver.video-12)")
+    get_sec = ADDON.getSetting("initiate_me")
+    xbmc.log("INITIATE IN SECONDSSSSS: " + str(get_sec), 2)
+    is_active = '{ "jsonrpc": "2.0", "id": 0, "method": "Settings.getSettingValue", "params": {"setting":"screensaver.mode" } }'
+    res = json.loads(xbmc.executeJSONRPC(is_active))
+    xbmc.log("RES  :" + str(res["result"]["value"]), 2)
+    if res["result"]["value"] == "screensaver.video-12":
+        xbmc.executebuiltin("Dialog.Close(all, true)", True)
+        for x in range(1, 50):
+            xbmc.log("X  : " + str(x), 2)
+            time.sleep(1)
+            if int(xbmc.getGlobalIdleTime()) == int(get_sec):
+                xbmc.log("global idle time : " + str(xbmc.getGlobalIdleTime()), 2)
+                xbmc.log("INITIATE STARTS>>>>>>>", 2)
+                xbmc.executebuiltin('RunScript(%s)' % (os.path.join(check_gui,"screensaver.py")))
+                break

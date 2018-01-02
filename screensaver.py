@@ -126,7 +126,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         self.player.play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
-        self._setRepeat()
+        # self._setRepeat()
         log("Started playing")
 
         # Now check to see if we are overlaying the time on the screen
@@ -134,12 +134,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
         timeControl.setVisible(Settings.isShowTime())
 
-        # Check if we need to show the weather
-        weatherControl = self.getControl(ScreensaverWindow.WEATHER_CONTROL)
-        if Settings.getWeatherAddon() not in ["", None]:
-            weatherControl.setVisible(True)
-        else:
-            weatherControl.setVisible(False)
+
 
         # Set the value of the dimming for the video
         dimLevel = Settings.getDimValue()
@@ -148,11 +143,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             dimControl = self.getControl(ScreensaverWindow.DIM_CONTROL)
             dimControl.setColorDiffuse(dimLevel)
 
-        # Set the overlay image
-        self._setOverlayImage()
 
-        # Update any settings that need to be done after the video is playing
-        self._updatePostPlayingForSettings(playlist)
 
     # Handle any activity on the screen, this will result in a call
     # to close the screensaver window
@@ -232,7 +223,6 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             videosFolder = Settings.get_current_week_even_odd()
             xbmc.log("videoFolder" + str(videosFolder), 2)
             if isinstance(videosFolder, basestring):
-                videomaker.main(videosFolder)
                 videos_in_folder = os.path.join(Settings.get_current_week_even_odd(), ".cache")
                 xbmc.log("videos_in_folder" + str(videos_in_folder), 2)
 
@@ -241,10 +231,10 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
                 videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in os.listdir(Settings.get_current_week_even_odd()) if ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
 
-                log("videos_in_imageFolder" + str(videos_in_imageFolder))
+                xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
 
                 videosFiles_in_cache_folder.extend(videos_in_imageFolder)
-                log("All files combines : " + str(videosFiles_in_cache_folder))
+                xbmc.log("All files combines : " + str(videosFiles_in_cache_folder), 2)
 
 
                 # Now shuffle the playlist to ensure that if there are more
@@ -252,14 +242,14 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
                 random.shuffle(videosFiles_in_cache_folder)
                 for vidFile in videosFiles_in_cache_folder:
                     xbmc.log("VideFIle : " + str(vidFile), 2)
-                    liz = xbmcgui.ListItem(ntpath.basename(vidFile),
-                                            iconImage = '',
-                                            thumbnailImage = '')
-                    liz.setInfo( type = "Video", infoLabels=ntpath.basename(vidFile))
-                    # #     # Now that we're actually playing the video, ask the scraper to give us the video url
-                    vidFile=os.path.join(videosFolder,vidFile)
-                    xbmc.log("url ::: :" + str(vidFile),2)
-                    playlist.add(vidFile, liz)
+                    # liz = xbmcgui.ListItem(ntpath.basename(vidFile),
+                    #                         iconImage = '',
+                    #                         thumbnailImage = '')
+                    # liz.setInfo( type = "Video", infoLabels=ntpath.basename(vidFile))
+                    # # #     # Now that we're actually playing the video, ask the scraper to give us the video url
+                    # vidFile=os.path.join(videosFolder,vidFile)
+                    # xbmc.log("url ::: :" + str(vidFile),2)
+                    # playlist.add(vidFile, liz)
                     log("Screensaver video in directory is: %s" % vidFile)
                     playlist.add(vidFile)
             # # Must be dealing with a single file
@@ -747,18 +737,20 @@ if __name__ == '__main__':
             if (screensaverTimeout < 1) and (scheduleSetting == Settings.SCHEDULE_OFF):
                 xbmc.log("Starting Screensaver in Modal Mode", 2)
                 screenWindow.doModal()
-            else:
-                xbmc.log("Starting Screensaver in Show Mode", 2)
-                screenWindow.show()
-
-                #The timeout is in minutes, and the sleep is in msec, so convert the
-                #countdown into the correct "sleep units" which will be every 0.1 seconds
-                checkInterval = 100
-                countdown = screensaverTimeout * 60 * (1000 / checkInterval)
+            # else:
+            #     xbmc.log("Starting Screensaver in Show Mode", 2)
+            #     screenWindow.show()
+            #
+            #     #The timeout is in minutes, and the sleep is in msec, so convert the
+            #     #countdown into the correct "sleep units" which will be every 0.1 seconds
+            #     checkInterval = 100
+            #     countdown = screensaverTimeout * 60 * (1000 / checkInterval)
 
                 # Now wait until the screensaver is closed
+                count = 0
                 while not screenWindow.isComplete():
-                    xbmc.sleep(checkInterval)
+                    # xbmc.sleep(checkInterval)
+                    xbmc.log("[COUNT] : " + str(count), 2)
                     if screensaverTimeout > 0:
                         # Update the countdown
                         countdown = countdown - 1
@@ -772,11 +764,12 @@ if __name__ == '__main__':
                             # we can then check to see if there is any action to perform
                             # before we completely exit the screensaver script
                             didScreensaverTimeout = True
+                            count += 1
                             break
 
                     # Check to see if there is anything that needs to be done
                     # for the screensaver, like change the video on schedule
-                    screenWindow.check()
+                    # screenWindow.check()
         except:
             log("VideoScreensaver ERROR: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
