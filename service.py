@@ -201,7 +201,7 @@ if __name__ == '__main__':
     media_data_path = check_new_path()
     monitor = BaseMonitor()
     # Check if we should start the screen saver video on startup
-    # launchplugin.main()
+    launchplugin.main()
     while not monitor.abortRequested():
         xbmc.sleep(500)
         if monitor.abortRequested():
