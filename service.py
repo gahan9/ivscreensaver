@@ -5,8 +5,9 @@ import xbmcaddon
 import xbmcvfs
 from bs4 import BeautifulSoup
 from xml.etree.ElementTree import parse, Element
-import videomaker
+from videomaker import VideoMaker
 import launchplugin
+from md5_check import get_directory_hash
 
 
 def print_log(*args):
@@ -67,25 +68,28 @@ def insert_data(content_list=None, content_location=None, flag=0, target_xml=ADD
     if content_list:
         for content in content_list:
             if content.split('.')[-1] in ['mp4', 'mkv']:
-                category.append(Element("setting",
-                                        {"label": "{0}".format(content.split(".")[0]),
-                                         "type": "slider",
-                                         "default": "3",
-                                         "range": "0,30",
-                                         "option": "int",
-                                         "id": "{0}".format(content)
-                                         }))
-    if content_location:
-        for content in os.listdir(content_location):
-            if content.endswith(".mp4") or content.endswith(".mkv"):
+                label = '.'.join(content.split(".")[:-1])
                 category.append(
                     Element("setting",
-                            {"label": "{0}".format(content.split(".")[0]),
-                             "type": "slider", "default": "3",
+                            {"label": label,
+                             "type": "slider", "default": "5",
                              "range": "0,30",
                              "option": "int",
-                             "id": "{0}".format(content)
+                             "id": content
                              }))
+    if content_location:
+        if os.path.exists(content_location):
+            for content in os.listdir(content_location):
+                if content.endswith(".mp4") or content.endswith(".mkv"):
+                    label = '.'.join(content.split(".")[:-1])
+                    category.append(
+                        Element("setting",
+                                {"label": label,
+                                 "type": "slider", "default": "5",
+                                 "range": "0,30",
+                                 "option": "int",
+                                 "id": content
+                                 }))
     xml_doc.write(target_xml, xml_declaration=True)
     print_log("insert_data() : xml updated")
 
@@ -105,18 +109,38 @@ def remove_xml(target_xml=ADDON_RESOURCE_SETTING, label=LABELS[0]):
 
 def writexml(path, flag=0):
     print_log("writexml() : initialized")
-    remove_xml(label=LABELS[flag])
-    cache_folder = os.path.join(path, ".cache")
-    if not cache_folder:
-        os.mkdir(cache_folder)
-    xbmc.executebuiltin("ActivateWindow(busydialog)")
-    xbmc.sleep(100)
-    videomaker.main(image_list=path)
-    # print_log(os.listdir(cache_folder), path)
-    insert_data(content_list=os.listdir(cache_folder), content_location=path, flag=flag)
-    xbmc.sleep(100)
-    xbmc.executebuiltin("Dialog.Close(busydialog)")
-    print_log("writexml() : progress 100 percent")
+    if os.path.exists(path):
+        print_log(path)
+        remove_xml(label=LABELS[flag])
+        cache_folder = os.path.join(path, ".cache")
+        if not os.path.exists(cache_folder):
+            os.mkdir(cache_folder)
+        xbmc.executebuiltin("ActivateWindow(busydialog)")
+        xbmc.sleep(100)
+        converter_obj = VideoMaker()
+        source = os.listdir(path)
+        print_log("source image list", source, converter_obj.supported_extension)
+        for content in source:
+            content_extension = content.split(".")[-1]
+            if content_extension in ['jpg', 'jpeg', 'png']:
+                converter_obj.make_video_ffmpeg(content, source_path=path, target_path=cache_folder, duration=5)
+                print("Process for {} completed".format(content))
+        # print_log(os.listdir(cache_folder), path)
+        target_list = os.listdir(cache_folder)
+        target_content = ['.'.join(content.split(".")[:-1]) for content in target_list]
+        source_content = ['.'.join(content.split(".")[:-1]) for content in source]
+        for file in target_content:
+            if file not in source_content:
+                for elem in target_list:
+                    if elem.startswith(file):
+                        os.remove(os.path.join(cache_folder, elem))
+        insert_data(content_list=os.listdir(cache_folder), flag=flag)
+        insert_data(content_list=os.listdir(path), flag=flag)
+        xbmc.sleep(100)
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        with open(os.path.join(ADDON_HOME, "{}.md5".format(LABELS[flag])), "w") as f:
+            f.write(get_directory_hash(path))
+        print_log("writexml() : progress 100%")
 
 
 def readxml(directory_items, target_xml=ADDON_RESOURCE_SETTING):
@@ -132,13 +156,13 @@ def readxml(directory_items, target_xml=ADDON_RESOURCE_SETTING):
                 if even_images_from_settings:
                     new_images_in_even_folder_exists = os.listdir(directory_items.get("select_media_even"))
                     if len(even_images_from_settings) != len(new_images_in_even_folder_exists):
-                        return True
+                        writexml(directory_items.get("select_media_even"), flag=0)
             if LABELS[1] in sett["label"]:  # ODD_PICTURES
                 odd_images_from_settings = setting_tags if setting_tags else None
                 if odd_images_from_settings:
                     new_images_in_odd_folder_exists = os.listdir(directory_items.get("select_media_odd"))
                     if len(odd_images_from_settings) != len(new_images_in_odd_folder_exists):
-                        return True
+                        writexml(directory_items.get("select_media_odd"), flag=1)
 
 
 def check_new_path(target_xml=CACHE_SETTING_FILE):
@@ -157,7 +181,6 @@ def check_new_path(target_xml=CACHE_SETTING_FILE):
 
 class BaseMonitor(xbmc.Monitor):
     def onSettingsChanged(self):
-        # print_log("In settings change....")
         return True
 
 
@@ -166,9 +189,8 @@ if __name__ == '__main__':
     # Make sure that the settings have been updated correctly
     media_data_path = check_new_path()
     monitor = BaseMonitor()
-
     # Check if we should start the screen saver video on startup
-    launchplugin.main()
+    # launchplugin.main()
     while not monitor.abortRequested():
         xbmc.sleep(500)
         if monitor.abortRequested():
@@ -176,6 +198,34 @@ if __name__ == '__main__':
             os._exit(1)
 
         recursive_path_check = check_new_path()
+        print_log("path_recursion", recursive_path_check)
+
+        if 'select_media_odd' in recursive_path_check:
+            get_odd_path = recursive_path_check.get("select_media_odd")
+            odd_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[1]))
+            if os.path.exists(odd_md5):
+                with open(odd_md5, "r") as f:
+                    existing_md5 = f.read().strip()
+                    new_md5 = get_directory_hash(get_odd_path)
+                    if new_md5 != existing_md5:
+                        print_log("odd_md5_trigger", existing_md5, new_md5)
+                        writexml(get_odd_path, flag=1)
+            else:
+                with open(odd_md5, 'w') as f:
+                    f.write(get_directory_hash(get_odd_path))
+        if 'select_media_even' in recursive_path_check:
+            get_even_path = recursive_path_check.get("select_media_even")
+            even_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[0]))
+            if os.path.exists(even_md5):
+                with open(even_md5, "r") as f:
+                    existing_md5 = f.read().strip()
+                    if get_directory_hash(get_even_path) != existing_md5:
+                        print_log("even_md5_trigger", existing_md5, even_md5)
+                        writexml(get_even_path, flag=0)
+            else:
+                with open(even_md5, 'w') as f:
+                    f.write(get_directory_hash(get_even_path))
+
         if monitor.onSettingsChanged():
             # print_log("Settings Changed")
             if 'select_media_odd' in media_data_path and 'select_media_odd' in recursive_path_check:
@@ -183,6 +233,7 @@ if __name__ == '__main__':
                     print_log("odd_change_trigger")
                     get_odd_path = recursive_path_check.get("select_media_odd")
                     writexml(get_odd_path, flag=1)
+
             if 'select_media_even' in media_data_path and 'select_media_even' in recursive_path_check:
                 if not media_data_path['select_media_even'] == recursive_path_check['select_media_even']:
                     print_log("even_change_trigger")
@@ -191,3 +242,4 @@ if __name__ == '__main__':
             media_data_path = check_new_path()
         else:
             xbmc.sleep(500)
+
