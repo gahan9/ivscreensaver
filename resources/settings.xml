@@ -2,7 +2,7 @@
     <category label="32001">
         <setting default="" id="select_media_odd" label="Media for ODD Week" type="folder" />
         <setting default="" id="select_media_even" label="Media for EVEN Week" type="folder" />
-        <setting default="3" id="time" label="Display Time Per Image" type="labelenum" values="3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60" />
+        <setting default="8" id="time" label="Display Time Per Image" type="labelenum" values="3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60" />
         <setting default="0" id="dimLevel" label="Dim Level" option="int" range="0,1,14" type="slider" />
     </category>
     <category label="ODD_PICTURES">
