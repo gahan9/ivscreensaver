@@ -83,7 +83,7 @@ def insert_data(content_list=None, content_location=None, flag=0, target_xml=ADD
                 category.append(
                     Element("setting",
                             {"label": label,
-                             "type": "slider", "default": "5",
+                             "type": "slider", "default": "8",
                              "range": "0,30",
                              "option": "int",
                              "id": content
@@ -96,7 +96,7 @@ def insert_data(content_list=None, content_location=None, flag=0, target_xml=ADD
                     category.append(
                         Element("setting",
                                 {"label": label,
-                                 "type": "slider", "default": "5",
+                                 "type": "slider", "default": "8",
                                  "range": "0,30",
                                  "option": "int",
                                  "id": content
