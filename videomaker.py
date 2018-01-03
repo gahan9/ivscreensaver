@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import threading
-from shutil import copyfile
+import sys
 
 try:
     import xbmc
@@ -115,10 +115,17 @@ class VideoMaker(object):
             else "{}:{}".format(self.width, self.height)
         # set output setting flags like duration encoding etc.
         output_settings = "-c:v libx264 -t {} -pix_fmt yuv420p -vf scale={}".format(duration, scale)
-        ff = ffmpy.FFmpeg(
-            inputs={input_image: '-loop 1'},  # loop to iterate same image again and again
-            outputs={output_video: output_settings}
-        )
+        if sys.platform == 'win32':
+            ff = ffmpy.FFmpeg(
+                executable=os.path.join(ADDON_PATH, 'ffmpeg.exe'),
+                inputs={input_image: '-loop 1'},  # loop to iterate same image again and again
+                outputs={output_video: output_settings}
+            )
+        else:
+            ff = ffmpy.FFmpeg(
+                inputs={input_image: '-loop 1'},  # loop to iterate same image again and again
+                outputs={output_video: output_settings}
+            )
         """
         ff = ffmpy.FFmpeg(
             inputs={r"C:\Users\Quixom\AppData\Roaming\Kodi\ScreenSaver_ADDON\even_anonymous\0124654c7950f4f823c1092c60837ccc.jpg": '-loop 1'},
