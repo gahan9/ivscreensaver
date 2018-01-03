@@ -115,8 +115,8 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             return
 
         # Update the playlist with any settings such as add image
-        thread = img_video_update()
-        thread.start()
+        # thread = img_video_update()
+        # thread.start()
         # self._updatePlaylistForSettings(playlist)
 
         # Update the volume if needed
