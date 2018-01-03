@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 try:
-    ADDON_ID = 'screensaver.video-12'
+    ADDON_ID = 'screensaver.customslideshow'
     ADDON_PATH = xbmc.translatePath('special://home/addons/'+ADDON_ID)
     if not os.path.exists(ADDON_PATH):
         try:
@@ -92,7 +92,7 @@ class VideoMaker(object):
 
     def make_video_ffmpeg(self, content, source_path=None, target_path=None, flag="keep", **kwargs):
         """
-        BASE_COMMAND C:\Users\Quixom\AppData\Roaming\Kodi\addons\screensaver.video-12\ffmpeg.exe -loop 1 -i C:\Users\Quixom\AppData\Roaming\Kodi\ScreenSaver_ADDON\even_anonymous\anonymous_1920x1200.jpg -c:v libx264 -t 5 -pix_fmt yuv420p -vf scale=1920:1080 C:\Users\Quixom\AppData\Roaming\Kodi\ScreenSaver_ADDON\even_anonymous\.cache\a.mp4
+        BASE_COMMAND C:\Users\Quixom\AppData\Roaming\Kodi\addons\screensaver.customslideshow\ffmpeg.exe -loop 1 -i C:\Users\Quixom\AppData\Roaming\Kodi\ScreenSaver_ADDON\even_anonymous\anonymous_1920x1200.jpg -c:v libx264 -t 5 -pix_fmt yuv420p -vf scale=1920:1080 C:\Users\Quixom\AppData\Roaming\Kodi\ScreenSaver_ADDON\even_anonymous\.cache\a.mp4
         BASE_COMMAND <ffmpeg-exe> -loop 1 -i <image_path> -c:v libx264 -t 5 -pix_fmt yuv420p -vf scale=1920:1080 <target-video>
         :param content: full absolute image path
         :param source_path: image location

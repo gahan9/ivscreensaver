@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import xbmc, xbmcaddon, json, os, time
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 
 #########################
 # Constants

@@ -26,7 +26,7 @@ def print_log(*args):
 
 
 # CONSTANTS
-ADDON_ID = 'screensaver.video-12'
+ADDON_ID = 'screensaver.customslideshow'
 ADDON = xbmcaddon.Addon(id=ADDON_ID)
 CWD = ADDON.getAddonInfo('path').decode("utf-8")
 XBMC_HOME = xbmc.translatePath('special://home/')

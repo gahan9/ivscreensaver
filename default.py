@@ -9,7 +9,7 @@ import traceback
 from resources.lib.settings import log
 from resources.lib.settings import Settings
 
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 CWD = ADDON.getAddonInfo('path').decode("utf-8")
 
 

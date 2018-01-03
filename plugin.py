@@ -16,7 +16,7 @@ from resources.lib.settings import os_path_join
 from resources.lib.settings import list_dir
 from resources.lib.collectSets import CollectSets
 
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 ICON = ADDON.getAddonInfo('icon')
 FANART = ADDON.getAddonInfo('fanart')
 
