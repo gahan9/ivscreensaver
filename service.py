@@ -52,7 +52,18 @@ if not os.path.exists(CACHE_DATA_FOLDER):
     xbmcvfs.mkdir(CACHE_DATA_FOLDER)
 
 if not os.path.exists(CACHE_SETTING_FILE):
-    with open(CACHE_SETTING_FILE, "a+") as one:
+    with open(CACHE_SETTING_FILE, "a+") as cache_media:
+        xml_default_content = """<settings>
+                        <setting id="dimLevel" value="0" />
+                        <setting id="initiate_me" value="10" />
+                        <setting id="odd_even_is_enabled" value="true" />
+                        <setting id="select_media_even" value="" />
+                        <setting id="select_media_odd" value="" />
+                        <setting id="time" value="3" />
+                        <setting id="useFolder" value="true" />
+                    </settings>
+                    """
+        cache_media.write(xml_default_content)
         print_log("create file xml")
 _image_extension = [".png", ".jpeg", ".jpg"]
 _video_extension = [".mp4", ".mkv", ".avi"]
@@ -123,7 +134,7 @@ def writexml(path, flag=0):
         for content in source:
             content_extension = content.split(".")[-1]
             if content_extension in ['jpg', 'jpeg', 'png']:
-                converter_obj.make_video_ffmpeg(content, source_path=path, target_path=cache_folder, duration=5)
+                converter_obj.make_video_ffmpeg(content, source_path=path, target_path=cache_folder, duration=8)
                 print("Process for {} completed".format(content))
         # print_log(os.listdir(cache_folder), path)
         target_list = os.listdir(cache_folder)
@@ -200,32 +211,6 @@ if __name__ == '__main__':
         recursive_path_check = check_new_path()
         print_log("path_recursion", recursive_path_check)
 
-        if 'select_media_odd' in recursive_path_check:
-            get_odd_path = recursive_path_check.get("select_media_odd")
-            odd_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[1]))
-            if os.path.exists(odd_md5):
-                with open(odd_md5, "r") as f:
-                    existing_md5 = f.read().strip()
-                    new_md5 = get_directory_hash(get_odd_path)
-                    if new_md5 != existing_md5:
-                        print_log("odd_md5_trigger", existing_md5, new_md5)
-                        writexml(get_odd_path, flag=1)
-            else:
-                with open(odd_md5, 'w') as f:
-                    f.write(get_directory_hash(get_odd_path))
-        if 'select_media_even' in recursive_path_check:
-            get_even_path = recursive_path_check.get("select_media_even")
-            even_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[0]))
-            if os.path.exists(even_md5):
-                with open(even_md5, "r") as f:
-                    existing_md5 = f.read().strip()
-                    if get_directory_hash(get_even_path) != existing_md5:
-                        print_log("even_md5_trigger", existing_md5, even_md5)
-                        writexml(get_even_path, flag=0)
-            else:
-                with open(even_md5, 'w') as f:
-                    f.write(get_directory_hash(get_even_path))
-
         if monitor.onSettingsChanged():
             # print_log("Settings Changed")
             if 'select_media_odd' in media_data_path and 'select_media_odd' in recursive_path_check:
@@ -242,4 +227,29 @@ if __name__ == '__main__':
             media_data_path = check_new_path()
         else:
             xbmc.sleep(500)
+            if 'select_media_odd' in recursive_path_check:
+                get_odd_path = recursive_path_check.get("select_media_odd")
+                odd_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[1]))
+                if os.path.exists(odd_md5):
+                    with open(odd_md5, "r") as f:
+                        existing_md5 = f.read().strip()
+                        new_md5 = get_directory_hash(get_odd_path)
+                        if new_md5 != existing_md5:
+                            print_log("odd_md5_trigger", existing_md5, new_md5)
+                            writexml(get_odd_path, flag=1)
+                else:
+                    with open(odd_md5, 'w') as f:
+                        f.write(get_directory_hash(get_odd_path))
+            if 'select_media_even' in recursive_path_check:
+                get_even_path = recursive_path_check.get("select_media_even")
+                even_md5 = os.path.join(ADDON_HOME, "{}.md5".format(LABELS[0]))
+                if os.path.exists(even_md5):
+                    with open(even_md5, "r") as f:
+                        existing_md5 = f.read().strip()
+                        if get_directory_hash(get_even_path) != existing_md5:
+                            print_log("even_md5_trigger", existing_md5, even_md5)
+                            writexml(get_even_path, flag=0)
+                else:
+                    with open(even_md5, 'w') as f:
+                        f.write(get_directory_hash(get_even_path))
 
