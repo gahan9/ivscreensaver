@@ -9,9 +9,9 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
+import threading
 import xml.etree.ElementTree as ET
 from service import print_log as log
-import videomaker
 
 if sys.version_info >= (2, 7):
     import json
@@ -107,7 +107,6 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     def onInit(self):
         xbmcgui.WindowXML.onInit(self)
         self.volumeCtrl = None
-
         # Get the videos to use as a screensaver
         playlist = self._getPlaylist()
         # If there is nothing to play, then exit now
@@ -115,8 +114,10 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             self.close()
             return
 
-        # Update the playlist with any settings such as random start time
-        self._updatePlaylistForSettings(playlist)
+        # Update the playlist with any settings such as add image
+        thread = img_video_update()
+        thread.start()
+        # self._updatePlaylistForSettings(playlist)
 
         # Update the volume if needed
         self.volumeCtrl = VolumeDrop()
@@ -126,7 +127,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         self.player.play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
-        # self._setRepeat()
+        self._setRepeat()
         log("Started playing")
 
         # Now check to see if we are overlaying the time on the screen
@@ -134,16 +135,12 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
         timeControl.setVisible(Settings.isShowTime())
 
-
-
         # Set the value of the dimming for the video
         dimLevel = Settings.getDimValue()
         if dimLevel is not None:
             log("Setting Dim Level to: %s" % dimLevel)
             dimControl = self.getControl(ScreensaverWindow.DIM_CONTROL)
             dimControl.setColorDiffuse(dimLevel)
-
-
 
     # Handle any activity on the screen, this will result in a call
     # to close the screensaver window
@@ -186,7 +183,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             self.volumeCtrl.restoreVolume()
             self.volumeCtrl = None
 
-        log("Closing Window")
+        xbmc.log("Closing Window", 2)
         # Record that we are closing
         self.isClosed = True
         xbmcgui.WindowXML.close(self)
@@ -223,33 +220,55 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             videosFolder = Settings.get_current_week_even_odd()
             xbmc.log("videoFolder" + str(videosFolder), 2)
             if isinstance(videosFolder, basestring):
+                xbmc.log("odd-even enabled-----------------------", 2)
                 videos_in_folder = os.path.join(Settings.get_current_week_even_odd(), ".cache")
-                xbmc.log("videos_in_folder" + str(videos_in_folder), 2)
+                xbmc.log("videos_in_cache_folder" + str(videos_in_folder), 2)
 
-                videosFiles_in_cache_folder = [os.path.join(videos_in_folder, vfile) for vfile in os.listdir(videos_in_folder)]
-                xbmc.log("imagesvideosFiles" + str(videosFiles_in_cache_folder), 2)
+                videosFiles_in_cache_folder = [os.path.join(videos_in_folder, vfile) for vfile in
+                                               os.listdir(videos_in_folder)]
+                xbmc.log("videos from cache folder :" + str(videosFiles_in_cache_folder), 2)
 
-                videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in os.listdir(Settings.get_current_week_even_odd()) if ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
+                videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in
+                                         os.listdir(Settings.get_current_week_even_odd()) if
+                                         ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
 
-                xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
-
+                # xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
+                # handled single path i.e, odd/even path at a time
                 videosFiles_in_cache_folder.extend(videos_in_imageFolder)
                 xbmc.log("All files combines : " + str(videosFiles_in_cache_folder), 2)
+                for vidFile in videosFiles_in_cache_folder:
+                    xbmc.log("VideFIle : " + str(vidFile), 2)
+                    log("Screensaver video in directory is: %s" % vidFile)
+                    playlist.add(vidFile)
 
+            else:
+                xbmc.log("odd-even disabled-----------------------", 2)
+                videosFiles_from_all_folder = [os.path.join(videosFolder[0], ".cache", vid) for vid in
+                                               os.listdir(os.path.join(videosFolder[0], '.cache')) if
+                                               vid not in [".png", ".jpg", ".jpeg",
+                                                           ".cache"]]  # files from odd/even .cache folder
+
+                videosFiles_from_all_folder.extend(os.path.join(videosFolder[1], ".cache", v1) for v1 in
+                                                   os.listdir(os.path.join(videosFolder[1], '.cache')) if
+                                                   v1 not in [".png", ".jpg", ".jpeg",
+                                                              ".cache"])  # files from odd/even .cache folder
+
+                xbmc.log("vides-from_even-odd-cache_folder : " + str(videosFiles_from_all_folder), 2)
+
+                videosFiles_from_all_folder.extend(
+                    os.path.join(videosFolder[0], odd_v) for odd_v in os.listdir(videosFolder[0]) if
+                    odd_v in [".mp4", ".mkv"])  # files from odd folder
+                videosFiles_from_all_folder.extend(
+                    os.path.join(videosFolder[0], even_v) for even_v in os.listdir(videosFolder[1]) if
+                    even_v in [".mp4", ".mkv"])  # files from even folder
+
+                xbmc.log("All files combines : " + str(videosFiles_from_all_folder), 2)
 
                 # Now shuffle the playlist to ensure that if there are more
                 # than one video a different one starts each time
-                random.shuffle(videosFiles_in_cache_folder)
-                for vidFile in videosFiles_in_cache_folder:
+                # random.shuffle(videosFiles_in_cache_folder)
+                for vidFile in videosFiles_from_all_folder:
                     xbmc.log("VideFIle : " + str(vidFile), 2)
-                    # liz = xbmcgui.ListItem(ntpath.basename(vidFile),
-                    #                         iconImage = '',
-                    #                         thumbnailImage = '')
-                    # liz.setInfo( type = "Video", infoLabels=ntpath.basename(vidFile))
-                    # # #     # Now that we're actually playing the video, ask the scraper to give us the video url
-                    # vidFile=os.path.join(videosFolder,vidFile)
-                    # xbmc.log("url ::: :" + str(vidFile),2)
-                    # playlist.add(vidFile, liz)
                     log("Screensaver video in directory is: %s" % vidFile)
                     playlist.add(vidFile)
             # # Must be dealing with a single file
@@ -269,7 +288,8 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
                 errorLocation = Settings.getScreensaverFolder()
 
             log("No Screensaver file set or not valid %s" % errorLocation)
-            cmd = 'Notification("{0}", "{1}", 3000, "{2}")'.format(ADDON.getLocalizedString(32300).encode('utf-8'), errorLocation, ADDON.getAddonInfo('icon'))
+            cmd = 'Notification("{0}", "{1}", 3000, "{2}")'.format(ADDON.getLocalizedString(32300).encode('utf-8'),
+                                                                   errorLocation, ADDON.getAddonInfo('icon'))
             xbmc.executebuiltin(cmd)
             return None
 
@@ -419,6 +439,33 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             self._updatePostPlayingForSettings(newPlaylist)
 
 
+class img_video_update(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        xbmc.log("IN IMAGE VIDEO UPDATE CLASS", 2)
+        # self._get_items =  kwargs['data']
+        threading.Thread.__init__(self)
+        self.stop = False
+        self.Monitor = MyMonitor(action=self._exit)
+
+    def _get_items(self):
+        log("check update _get_items")
+
+    def run(self):
+        while (not self.Monitor.abortRequested()) and (not self.stop):
+            # create a fresh index as quickly as possible after slidshow started
+            self._get_items()
+            count = 0
+            while count != 5:  # check for new images every 5seconds
+                xbmc.sleep(200)
+                count += 1
+                if self.Monitor.abortRequested() or self.stop:
+                    return
+
+    def _exit(self):
+        # exit when onScreensaverDeactivated gets called
+        self.stop = True
+
+
 class VolumeDrop(object):
     def __init__(self, *args):
         self.screensaverVolume = Settings.getVolume()
@@ -428,7 +475,8 @@ class VolumeDrop(object):
 
     # This will return the volume in a range of 0-100
     def _getVolume(self):
-        result = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Application.GetProperties", "params": { "properties": [ "volume" ] }, "id": 1}')
+        result = xbmc.executeJSONRPC(
+            '{"jsonrpc": "2.0", "method": "Application.GetProperties", "params": { "properties": [ "volume" ] }, "id": 1}')
 
         json_query = json.loads(result)
         if ("result" in json_query) and ('volume' in json_query['result']):
@@ -580,8 +628,10 @@ class Scheduler(object):
                     startTime = Settings.getRuleStartTime(itemNum)
                     endTime = Settings.getRuleEndTime(itemNum)
                     day = Settings.getRuleDay(itemNum)
-                    log("Schedule: Item %d (Start:%d, End:%d, Day: %d) contains video %s" % (itemNum, startTime, endTime, day, videoFile))
-                    details = {'id': itemNum, 'start': startTime, 'end': endTime, 'day': day, 'video': videoFile, 'overlay': overlayFile}
+                    log("Schedule: Item %d (Start:%d, End:%d, Day: %d) contains video %s" % (
+                    itemNum, startTime, endTime, day, videoFile))
+                    details = {'id'     : itemNum, 'start': startTime, 'end': endTime, 'day': day, 'video': videoFile,
+                               'overlay': overlayFile}
                     self.scheduleDetails.append(details)
                 else:
                     log("Schedule: File does not exist: %s" % videoFile)
@@ -651,11 +701,13 @@ class Scheduler(object):
                         if overlayFile not in [None, ""]:
                             if overlayFile.startswith('..') or (("/" not in overlayFile) and ("\\" not in overlayFile)):
                                 overlayFile = os_path_join(directory, overlayFile)
-                        log("Schedule File: Item %d (Start:%d, End:%d) contains video %s" % (itemNum, startTime, endTime, videoFile))
+                        log("Schedule File: Item %d (Start:%d, End:%d) contains video %s" % (
+                        itemNum, startTime, endTime, videoFile))
 
                         # Check if the video file exists
                         if os_path_isfile(videoFile):
-                            details = {'id': itemNum, 'start': startTime, 'end': endTime, 'day': day, 'video': videoFile, 'overlay': overlayFile}
+                            details = {'id'   : itemNum, 'start': startTime, 'end': endTime, 'day': day,
+                                       'video': videoFile, 'overlay': overlayFile}
                             self.scheduleDetails.append(details)
                         else:
                             log("Schedule: File does not exist: %s" % videoFile)
@@ -702,6 +754,14 @@ class Scheduler(object):
         return day
 
 
+class MyMonitor(xbmc.Monitor):
+    def __init__(self, *args, **kwargs):
+        self.action = kwargs['action']
+
+    def onScreensaverDeactivated(self):
+        self.action()
+
+
 ##################################
 # Main of the Video Screensaver
 ##################################
@@ -737,14 +797,14 @@ if __name__ == '__main__':
             if (screensaverTimeout < 1) and (scheduleSetting == Settings.SCHEDULE_OFF):
                 xbmc.log("Starting Screensaver in Modal Mode", 2)
                 screenWindow.doModal()
-            # else:
-            #     xbmc.log("Starting Screensaver in Show Mode", 2)
-            #     screenWindow.show()
-            #
-            #     #The timeout is in minutes, and the sleep is in msec, so convert the
-            #     #countdown into the correct "sleep units" which will be every 0.1 seconds
-            #     checkInterval = 100
-            #     countdown = screensaverTimeout * 60 * (1000 / checkInterval)
+                # else:
+                #     xbmc.log("Starting Screensaver in Show Mode", 2)
+                #     screenWindow.show()
+                #
+                #     #The timeout is in minutes, and the sleep is in msec, so convert the
+                #     #countdown into the correct "sleep units" which will be every 0.1 seconds
+                #     checkInterval = 100
+                #     countdown = screensaverTimeout * 60 * (1000 / checkInterval)
 
                 # Now wait until the screensaver is closed
                 count = 0
