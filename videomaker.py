@@ -3,6 +3,7 @@
 import os
 import threading
 from shutil import copyfile
+
 try:
     import xbmc
 except ImportError:
@@ -63,7 +64,6 @@ class VideoMaker(object):
         self.height = '1080'
 
     def execute(self, path=None, duration=5, target_path=None, multi_threading=False, **kwargs):
-        duration_per_image = kwargs['image_dict'] if 'image_dict' in kwargs else None
         contents = os.listdir(path)
         target_path = target_path if target_path else os.path.join(path, ".cache")
         if not os.path.exists(target_path):
@@ -116,7 +116,6 @@ class VideoMaker(object):
         # set output setting flags like duration encoding etc.
         output_settings = "-c:v libx264 -t {} -pix_fmt yuv420p -vf scale={}".format(duration, scale)
         ff = ffmpy.FFmpeg(
-            executable=os.path.join(ADDON_PATH, 'ffmpeg.exe'),
             inputs={input_image: '-loop 1'},  # loop to iterate same image again and again
             outputs={output_video: output_settings}
         )
