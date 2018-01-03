@@ -1,15 +1,14 @@
 <settings>
     <category label="32001">
-        <setting default="true" id="useFolder" label="32023" type="bool" />
         <setting default="" id="select_media_odd" label="Media for ODD Week" type="folder" />
         <setting default="" id="select_media_even" label="Media for EVEN Week" type="folder" />
         <setting default="3" id="time" label="Display Time Per Image" type="labelenum" values="3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60" />
         <setting default="0" id="dimLevel" label="Dim Level" option="int" range="0,1,14" type="slider" />
     </category>
     <category label="ODD_PICTURES">
-    <setting default="5" id="is.mp4" label="is" option="int" range="0,30" type="slider" /><setting default="5" id="batf.mp4" label="batf" option="int" range="0,30" type="slider" /><setting default="5" id="batsplash.mp4" label="batsplash" option="int" range="0,30" type="slider" /><setting default="5" id="d1.mp4" label="d1" option="int" range="0,30" type="slider" /><setting default="5" id="d2.mp4" label="d2" option="int" range="0,30" type="slider" /><setting default="5" id="d3.mp4" label="d3" option="int" range="0,30" type="slider" /></category>
+    </category>
     <category label="EVEN_PICTURES">
-    <setting default="5" id="transformers-the-last-knight-3840x2160-optimus-prime-bumblebee-4k-9822.mp4" label="transformers-the-last-knight-3840x2160-optimus-prime-bumblebee-4k-9822" option="int" range="0,30" type="slider" /><setting default="5" id="64eabfe08326f5e8ae03ffc34e203b36--transformers-optimus-prime-iron.mp4" label="64eabfe08326f5e8ae03ffc34e203b36--transformers-optimus-prime-iron" option="int" range="0,30" type="slider" /><setting default="5" id="transformers-the-last-knight-optimus-prime-premium-scale-threea-feature-903080.mp4" label="transformers-the-last-knight-optimus-prime-premium-scale-threea-feature-903080" option="int" range="0,30" type="slider" /><setting default="5" id="External-Thumbnail-Unedited-4.mp4" label="External-Thumbnail-Unedited-4" option="int" range="0,30" type="slider" /><setting default="5" id="6dae6af9d9475aae46197d9f6b704f28.mp4" label="6dae6af9d9475aae46197d9f6b704f28" option="int" range="0,30" type="slider" /><setting default="5" id="Transformers.mp4" label="Transformers" option="int" range="0,30" type="slider" /><setting default="5" id="Optimus Prime vs. Infernocus 'Fight Scene' _ Transformers_ The Last Knight (2017) Digital HD.mp4" label="Optimus Prime vs. Infernocus 'Fight Scene' _ Transformers_ The Last Knight (2017) Digital HD" option="int" range="0,30" type="slider" /></category>
+    </category>
     <category label="Extra Features">
         <setting default="10" id="initiate_me" label="On Start Time" type="labelenum" values="10|20|30|40|50|" />
         <setting default="true" id="odd_even_is_enabled" label="Disable Odd Even Category" type="bool" />

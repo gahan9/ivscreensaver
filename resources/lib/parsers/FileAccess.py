@@ -12,7 +12,7 @@ import xbmcaddon
 VFS_AVAILABLE = True
 
 
-ADDON     = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON     = xbmcaddon.Addon(id='screensaver.customslideshow')
 ADDON_ID   = ADDON.getAddonInfo('id')
 
 

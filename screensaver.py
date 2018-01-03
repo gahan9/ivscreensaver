@@ -30,7 +30,7 @@ from resources.lib.settings import os_path_split
 from resources.lib.VideoParser import VideoParser
 from resources.lib.collectSets import CollectSets
 
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 CWD = ADDON.getAddonInfo('path').decode("utf-8")
 
 
@@ -213,64 +213,62 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
                 playlist.add(scheduledVideo)
 
         # Check if we are showing all the videos in a given folder
+        xbmc.log("VIDEOFOLDER EXISTS", 2)
+        # videosFolder = Settings.getScreensaverFolder()
+        videosFolder = Settings.get_current_week_even_odd()
+        xbmc.log("videoFolder" + str(videosFolder), 2)
+        if isinstance(videosFolder, basestring):
+            xbmc.log("odd-even enabled-----------------------", 2)
+            videos_in_folder = os.path.join(Settings.get_current_week_even_odd(), ".cache")
+            xbmc.log("videos_in_cache_folder" + str(videos_in_folder), 2)
 
-        if Settings.isFolderSelection():
-            xbmc.log("VIDEOFOLDER EXISTS", 2)
-            # videosFolder = Settings.getScreensaverFolder()
-            videosFolder = Settings.get_current_week_even_odd()
-            xbmc.log("videoFolder" + str(videosFolder), 2)
-            if isinstance(videosFolder, basestring):
-                xbmc.log("odd-even enabled-----------------------", 2)
-                videos_in_folder = os.path.join(Settings.get_current_week_even_odd(), ".cache")
-                xbmc.log("videos_in_cache_folder" + str(videos_in_folder), 2)
+            videosFiles_in_cache_folder = [os.path.join(videos_in_folder, vfile) for vfile in
+                                           os.listdir(videos_in_folder)]
+            xbmc.log("videos from cache folder :" + str(videosFiles_in_cache_folder), 2)
 
-                videosFiles_in_cache_folder = [os.path.join(videos_in_folder, vfile) for vfile in
-                                               os.listdir(videos_in_folder)]
-                xbmc.log("videos from cache folder :" + str(videosFiles_in_cache_folder), 2)
+            videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in
+                                     os.listdir(Settings.get_current_week_even_odd()) if
+                                     ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
 
-                videos_in_imageFolder = [os.path.join(Settings.get_current_week_even_odd(), ifile) for ifile in
-                                         os.listdir(Settings.get_current_week_even_odd()) if
-                                         ifile != ".cache" and (not (ifile.endswith(".png") or ifile.endswith("jpg")))]
+            # xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
+            # handled single path i.e, odd/even path at a time
+            videosFiles_in_cache_folder.extend(videos_in_imageFolder)
+            xbmc.log("All files combines : " + str(videosFiles_in_cache_folder), 2)
+            for vidFile in videosFiles_in_cache_folder:
+                xbmc.log("VideFIle : " + str(vidFile), 2)
+                log("Screensaver video in directory is: %s" % vidFile)
+                playlist.add(vidFile)
 
-                # xbmc.log("videos_in_imageFolder" + str(videos_in_imageFolder), 2)
-                # handled single path i.e, odd/even path at a time
-                videosFiles_in_cache_folder.extend(videos_in_imageFolder)
-                xbmc.log("All files combines : " + str(videosFiles_in_cache_folder), 2)
-                for vidFile in videosFiles_in_cache_folder:
-                    xbmc.log("VideFIle : " + str(vidFile), 2)
-                    log("Screensaver video in directory is: %s" % vidFile)
-                    playlist.add(vidFile)
+        else:
+            xbmc.log("odd-even disabled-----------------------", 2)
+            videosFiles_from_all_folder = [os.path.join(videosFolder[0], ".cache", vid) for vid in
+                                           os.listdir(os.path.join(videosFolder[0], '.cache')) if
+                                           vid not in [".png", ".jpg", ".jpeg",
+                                                       ".cache"]]  # files from odd/even .cache folder
 
-            else:
-                xbmc.log("odd-even disabled-----------------------", 2)
-                videosFiles_from_all_folder = [os.path.join(videosFolder[0], ".cache", vid) for vid in
-                                               os.listdir(os.path.join(videosFolder[0], '.cache')) if
-                                               vid not in [".png", ".jpg", ".jpeg",
-                                                           ".cache"]]  # files from odd/even .cache folder
+            videosFiles_from_all_folder.extend(os.path.join(videosFolder[1], ".cache", v1) for v1 in
+                                               os.listdir(os.path.join(videosFolder[1], '.cache')) if
+                                               v1 not in [".png", ".jpg", ".jpeg",
+                                                          ".cache"])  # files from odd/even .cache folder
 
-                videosFiles_from_all_folder.extend(os.path.join(videosFolder[1], ".cache", v1) for v1 in
-                                                   os.listdir(os.path.join(videosFolder[1], '.cache')) if
-                                                   v1 not in [".png", ".jpg", ".jpeg",
-                                                              ".cache"])  # files from odd/even .cache folder
+            xbmc.log("vides-from_even-odd-cache_folder : " + str(videosFiles_from_all_folder), 2)
 
-                xbmc.log("vides-from_even-odd-cache_folder : " + str(videosFiles_from_all_folder), 2)
+            videosFiles_from_all_folder.extend(
+                os.path.join(videosFolder[0], odd_v) for odd_v in os.listdir(videosFolder[0]) if
+                odd_v in [".mp4", ".mkv"])  # files from odd folder
+            videosFiles_from_all_folder.extend(
+                os.path.join(videosFolder[0], even_v) for even_v in os.listdir(videosFolder[1]) if
+                even_v in [".mp4", ".mkv"])  # files from even folder
 
-                videosFiles_from_all_folder.extend(
-                    os.path.join(videosFolder[0], odd_v) for odd_v in os.listdir(videosFolder[0]) if
-                    odd_v in [".mp4", ".mkv"])  # files from odd folder
-                videosFiles_from_all_folder.extend(
-                    os.path.join(videosFolder[0], even_v) for even_v in os.listdir(videosFolder[1]) if
-                    even_v in [".mp4", ".mkv"])  # files from even folder
+            xbmc.log("All files combines : " + str(videosFiles_from_all_folder), 2)
 
-                xbmc.log("All files combines : " + str(videosFiles_from_all_folder), 2)
-
-                # Now shuffle the playlist to ensure that if there are more
-                # than one video a different one starts each time
-                # random.shuffle(videosFiles_in_cache_folder)
-                for vidFile in videosFiles_from_all_folder:
-                    xbmc.log("VideFIle : " + str(vidFile), 2)
-                    log("Screensaver video in directory is: %s" % vidFile)
-                    playlist.add(vidFile)
+            # Now shuffle the playlist to ensure that if there are more
+            # than one video a different one starts each time
+            # random.shuffle(videosFiles_in_cache_folder)
+            for vidFile in videosFiles_from_all_folder:
+                xbmc.log("VideFIle : " + str(vidFile), 2)
+                log("Screensaver video in directory is: %s" % vidFile)
+                playlist.add(vidFile)
             # # Must be dealing with a single file
             # videoFile = Settings.getScreensaverVideo()
 
@@ -284,9 +282,6 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # If there are no videos in the playlist yet, then display an error
         if playlist.size() < 1:
             errorLocation = Settings.getScreensaverVideo()
-            if Settings.isFolderSelection():
-                errorLocation = Settings.getScreensaverFolder()
-
             log("No Screensaver file set or not valid %s" % errorLocation)
             cmd = 'Notification("{0}", "{1}", 3000, "{2}")'.format(ADDON.getLocalizedString(32300).encode('utf-8'),
                                                                    errorLocation, ADDON.getAddonInfo('icon'))

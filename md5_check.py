@@ -1,6 +1,7 @@
 def get_directory_hash(directory, verbose=0):
     import hashlib
     import os
+    import xbmc
     dir_hash = hashlib.md5()
     if not os.path.exists(directory):
         return -1
@@ -28,6 +29,7 @@ def get_directory_hash(directory, verbose=0):
 
     except:
         import traceback
+        xbmc.log(" MD5 FILE ERROR", 2)
         # Print the stack traceback
         traceback.print_exc()
         return -2

@@ -4,7 +4,7 @@ ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 
 #########################
 # Constants
-check_gui = xbmc.translatePath(os.path.join('special://home/addons/screensaver.video-12'))
+check_gui = xbmc.translatePath(os.path.join('special://home/addons/screensaver.customslideshow'))
 #########################
 
 
@@ -14,7 +14,7 @@ def main():
     is_active = '{ "jsonrpc": "2.0", "id": 0, "method": "Settings.getSettingValue", "params": {"setting":"screensaver.mode" } }'
     res = json.loads(xbmc.executeJSONRPC(is_active))
     xbmc.log("RES  :" + str(res["result"]["value"]), 2)
-    if res["result"]["value"] == "screensaver.video-12":
+    if res["result"]["value"] == "screensaver.customslideshow":
         xbmc.executebuiltin("Dialog.Close(all, true)", True)
         for x in range(1, 50):
             xbmc.log("X  : " + str(x), 2)

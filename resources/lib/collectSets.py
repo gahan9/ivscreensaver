@@ -13,7 +13,7 @@ from settings import Settings
 from settings import os_path_join
 from settings import os_path_split
 
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 ICON = ADDON.getAddonInfo('icon')
 
 

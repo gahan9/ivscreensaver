@@ -1,6 +1,6 @@
 # Kodi Media Center language file
 # Addon Name: VideoScreensaver
-# Addon id: screensaver.video-12
+# Addon id: screensaver.customslideshow
 # Addon Provider: robwebset
 msgid ""
 msgstr ""

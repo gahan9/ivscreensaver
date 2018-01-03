@@ -6,7 +6,7 @@ import xbmcaddon
 import xbmcvfs
 import datetime
 from service import print_log as log
-ADDON = xbmcaddon.Addon(id='screensaver.video-12')
+ADDON = xbmcaddon.Addon(id='screensaver.customslideshow')
 ADDON_ID = ADDON.getAddonInfo('id')
 
 

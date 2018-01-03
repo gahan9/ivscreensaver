@@ -13,7 +13,7 @@
 		<summary lang="en">Screensaver that plays a video file</summary>
 		<description lang="en">Plays a video when the screensaver starts, this can be a custom video or one of the built in videos</description>
 		<language>en</language>
-		<platform>Linux and Windows</platform>
+		<platform>all</platform>
 		<news>Upcoming Feature:
 		- Set timer for single image
 v0.0.1:
