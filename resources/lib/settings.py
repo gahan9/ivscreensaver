@@ -6,7 +6,6 @@ import xbmcaddon
 import xbmcvfs
 import datetime
 from service import print_log as log
-from datetime import *
 ADDON = xbmcaddon.Addon(id='screensaver.video-12')
 ADDON_ID = ADDON.getAddonInfo('id')
 
@@ -237,20 +236,12 @@ class Settings():
         return limitSessionToSingleCollection
 
 
-    def isAddonEnabled():
-        ### chikzz
-        is_odd_even_enabled = ADDON.getSetting('odd_even_is_enabled')
-        xbmc.log("Get enable/disable settings :" +  str(is_odd_even_enabled), 2)
-        return is_odd_even_enabled
-
     @staticmethod
     def get_current_week_even_odd():
             # xbmc.log("FETCH CURRENT WEEK # chikzz", 2)
-            # enabled_disabled_settings = isAddonEnabled()
             if ADDON.getSetting('odd_even_is_enabled') == 'true':
                 # xbmc.log("Feature is enable", 2)
-                date_today = datetime.today()
-                check_week = date_today.strftime("%U")
+                check_week = datetime.datetime.today().isocalendar()[1]
                 if (int(check_week) % 2) == 0:
                     return ADDON.getSetting('select_media_even')
                     # xbmc.log("EVEN", 2)
